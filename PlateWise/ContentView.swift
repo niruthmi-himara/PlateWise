@@ -5,7 +5,7 @@ struct ContentView: View {
     var body: some View {
         TabView {
             Tab("Today", systemImage: "fork.knife") {
-                Text("Today screen coming next")
+                TodayView()
             }
             Tab("History", systemImage: "chart.bar.fill") {
                 Text("History screen")
