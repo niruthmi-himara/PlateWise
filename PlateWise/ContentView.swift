@@ -1,7 +1,10 @@
 import SwiftUI
 import SwiftData
 
+/// Root view: the three main tabs, with the app's brand colour and chosen theme.
 struct ContentView: View {
+    @AppStorage("appearance") private var appearance: AppearanceMode = .system
+
     var body: some View {
         TabView {
             Tab("Today", systemImage: "fork.knife") {
@@ -11,9 +14,11 @@ struct ContentView: View {
                 HistoryView()
             }
             Tab("Settings", systemImage: "gearshape.fill") {
-                Text("Settings screen")
+                SettingsView()
             }
         }
+        .tint(.green)                                    // Brand colour for buttons and tabs
+        .preferredColorScheme(appearance.colorScheme)    // Light / Dark / System
     }
 }
 
