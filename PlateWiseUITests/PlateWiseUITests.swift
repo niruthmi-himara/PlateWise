@@ -1,39 +1,71 @@
-//
-//  PlateWiseUITests.swift
-//  PlateWiseUITests
-//
-//  Created by IM Student on 2026-10-13.
-//
-
 import XCTest
 
+/// UI tests: tap through the app like a real user would.
 final class PlateWiseUITests: XCTestCase {
+    private var app: XCUIApplication!
 
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-
-        // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
-
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
+        app = XCUIApplication()
         app.launch()
-
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
 
+    /// All three tabs open and show the right screen.
     @MainActor
-    func testLaunchPerformance() throws {
-        // This measures how long it takes to launch your application.
+    func testAllThreeTabsOpen() {
+        app.tabBars.buttons["History"].tap()
+        XCTAssertTrue(app.navigationBars["History"].waitForExistence(timeout: 3))
+
+        app.tabBars.buttons["Settings"].tap()
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 3))
+
+        app.tabBars.buttons["Today"].tap()
+        XCTAssertTrue(app.navigationBars["Today"].waitForExistence(timeout: 3))
+    }
+
+    /// A user can add a Sri Lankan dish from the menu and see it on Today.
+    @MainActor
+    func testAddSriLankanDishFromMenu() {
+        app.buttons["Add Meal"].tap()
+
+        let menu = app.buttons["Choose a Sri Lankan dish"]
+        XCTAssertTrue(menu.waitForExistence(timeout: 3))
+        menu.tap()
+        app.buttons["Kottu roti · 750 kcal"].tap()
+
+        app.buttons["Save"].tap()
+        XCTAssertTrue(app.staticTexts["Kottu roti"].firstMatch.waitForExistence(timeout: 3))
+    }
+
+    /// Save stays disabled until the form is filled in.
+    @MainActor
+    func testSaveDisabledForEmptyMeal() {
+        app.buttons["Add Meal"].tap()
+        let save = app.buttons["Save"]
+        XCTAssertTrue(save.waitForExistence(timeout: 3))
+        XCTAssertFalse(save.isEnabled)
+        app.buttons["Cancel"].tap()
+    }
+
+    /// Demo data loads and the theme can be switched to Dark and back.
+    @MainActor
+    func testDemoDataAndDarkMode() {
+        app.tabBars.buttons["Settings"].tap()
+        app.buttons["Load demo data"].tap()
+        let ok = app.alerts.buttons["OK"]
+        XCTAssertTrue(ok.waitForExistence(timeout: 3))
+        ok.tap()
+
+        app.buttons["Dark"].tap()
+        app.buttons["System"].tap()
+
+        app.tabBars.buttons["History"].tap()
+        XCTAssertFalse(app.staticTexts["No history yet"].exists)
+    }
+
+    /// Measures how long the app takes to launch (performance).
+    @MainActor
+    func testLaunchPerformance() {
         measure(metrics: [XCTApplicationLaunchMetric()]) {
             XCUIApplication().launch()
         }
