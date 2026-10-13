@@ -8,7 +8,7 @@ struct ContentView: View {
                 TodayView()
             }
             Tab("History", systemImage: "chart.bar.fill") {
-                Text("History screen")
+                HistoryView()
             }
             Tab("Settings", systemImage: "gearshape.fill") {
                 Text("Settings screen")
