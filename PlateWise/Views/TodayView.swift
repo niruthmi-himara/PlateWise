@@ -1,7 +1,7 @@
 import SwiftUI
 import SwiftData
 
-/// Home screen: today's calorie ring and meals grouped by type.
+/// Home screen: brand header, today's calorie ring and meals grouped by type.
 struct TodayView: View {
     @Query(sort: \Meal.date, order: .reverse) private var meals: [Meal]  // Auto-updates from SwiftData
     @AppStorage("dailyGoal") private var dailyGoal = 2000                 // Saved setting
@@ -19,8 +19,17 @@ struct TodayView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
+                    // Heading with today's date
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Today")
+                            .font(.largeTitle.bold())
+                        Text(Date.now.formatted(.dateTime.weekday(.wide).day().month(.wide)))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
                     CalorieRing(consumed: totalCalories, goal: dailyGoal)
-                        .padding(.top)
 
                     if todaysMeals.isEmpty {
                         ContentUnavailableView("No meals yet",
@@ -48,10 +57,14 @@ struct TodayView: View {
                 .padding()
             }
             .navigationTitle("Today")
+            .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: Meal.self) { meal in
                 MealDetailView(meal: meal)
             }
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    BrandHeader()                           // Logo + app name in the top bar
+                }
                 ToolbarItem(placement: .primaryAction) {
                     Button("Add Meal", systemImage: "plus") { showingAddMeal = true }
                 }
@@ -104,4 +117,9 @@ struct MealThumbnail: View {
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .accessibilityHidden(true)
     }
+}
+
+#Preview {
+    TodayView()
+        .modelContainer(for: Meal.self, inMemory: true)
 }

@@ -7,7 +7,27 @@ final class PlateWiseUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
+        app.launchArguments += ["-hasSeenOnboarding", "YES"]   // Skip onboarding in most tests
         app.launch()
+    }
+
+    /// A first-time user can go through the onboarding and reach the Today screen.
+    @MainActor
+    func testOnboardingFlow() {
+        app.terminate()
+        app.launchArguments = ["-hasSeenOnboarding", "NO"]
+        app.launch()
+
+        let next = app.buttons["Continue"]
+        XCTAssertTrue(next.waitForExistence(timeout: 3))
+        next.tap()
+        next.tap()
+        next.tap()
+
+        let start = app.buttons["Get Started"]
+        XCTAssertTrue(start.waitForExistence(timeout: 3))
+        start.tap()
+        XCTAssertTrue(app.buttons["Add Meal"].waitForExistence(timeout: 3))
     }
 
     /// All three tabs open and show the right screen.
@@ -20,7 +40,7 @@ final class PlateWiseUITests: XCTestCase {
         XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 3))
 
         app.tabBars.buttons["Today"].tap()
-        XCTAssertTrue(app.navigationBars["Today"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.buttons["Add Meal"].waitForExistence(timeout: 3))
     }
 
     /// A user can add a Sri Lankan dish from the menu and see it on Today.

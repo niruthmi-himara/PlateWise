@@ -24,6 +24,7 @@ struct SettingsView: View {
     @Environment(\.modelContext) private var context
     @AppStorage("dailyGoal") private var dailyGoal = 2000
     @AppStorage("appearance") private var appearance: AppearanceMode = .system
+    @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = true
     @State private var showingDeleteConfirm = false
     @State private var showingDemoAlert = false
 
@@ -71,6 +72,9 @@ struct SettingsView: View {
                     LabeledContent("Version",
                                    value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
                     LabeledContent("AI model", value: "MobileNetV2 (Core ML)")
+                    Button("Show welcome screens again", systemImage: "hand.wave") {
+                        hasSeenOnboarding = false
+                    }
                     Label("Photos are analysed on your device and never uploaded.",
                           systemImage: "lock.shield")
                         .font(.footnote)
